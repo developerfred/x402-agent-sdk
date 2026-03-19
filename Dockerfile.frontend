@@ -1,0 +1,23 @@
+# X402 Demo Frontend (Next.js)
+# Build: docker build -f Dockerfile.frontend -t x402-demo-frontend .
+# Run: docker run -p 3001:3001 x402-demo-frontend
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy example
+COPY examples/nextjs-demo ./src
+
+# Install dependencies
+RUN npm install next react react-dom
+RUN npm install -D typescript @types/react @types/node
+
+# Build
+RUN npm run build
+
+# Expose port
+EXPOSE 3001
+
+# Start
+CMD ["npm", "start"]

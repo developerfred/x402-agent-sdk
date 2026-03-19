@@ -1,0 +1,81 @@
+version: '3.8'
+
+# X402 Agent SDK - Demo Stack
+# Run with: docker-compose -f docker-compose.demo.yml up
+
+services:
+  # ===========================================
+  # Demo API Server (Express + x402)
+  # ===========================================
+  demo-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.demo
+    container_name: x402-demo-api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - X402_NETWORK=eip155:8453
+      - X402_PAYMENT_TOKEN=0x833589fCD6eDb6E08f4c7C32D4f71B54bdA02913
+      - X402_RECIPIENT=0x742d35Cc6634C0532925a3b844Bc9e7595f0fB1E
+      - X402_PRICE_PER_REQUEST=100
+      - X402_FACILITATOR_URL=http://mock-facilitator:8080
+    depends_on:
+      - mock-facilitator
+    networks:
+      - x402-demo
+
+  # ===========================================
+  # Mock Payment Facilitator
+  # ===========================================
+  mock-facilitator:
+    image: node:20-alpine
+    container_name: x402-mock-facilitator
+    working_dir: /app
+    command: npx -y @x402/mock-facilitator
+    ports:
+      - "8080:8080"
+    networks:
+      - x402-demo
+
+  # ===========================================
+  # Optional: Local Blockchain (Hardhat)
+  # ===========================================
+  hardhat:
+    image: ghcr.io/foundry-rs/foundry:latest
+    container_name: x402-hardhat
+    working_dir: /app
+    command: anvil --host 0.0.0.0 --port 8545
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./contracts:/app
+    networks:
+      - x402-demo
+    profiles:
+      - blockchain
+
+  # ===========================================
+  # Optional: Frontend Demo (Next.js)
+  # ===========================================
+  demo-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: x402-demo-frontend
+    ports:
+      - "3001:3001"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://demo-api:3000
+    depends_on:
+      - demo-api
+    networks:
+      - x402-demo
+    profiles:
+      - frontend
+
+networks:
+  x402-demo:
+    driver: bridge
