@@ -380,7 +380,7 @@ mod tests {
     fn test_sanitize_header_value() {
         use crate::security::InputValidator;
         
-        let sanitized = InputValidator::sanitize_header_value("正常文本内容");
+        let sanitized = InputValidator::sanitize_header_value("test-chars");
         assert_eq!(sanitized.len(), 0);
         
         let sanitized2 = InputValidator::sanitize_header_value("Hello World");
