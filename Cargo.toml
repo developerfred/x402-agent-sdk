@@ -5,7 +5,7 @@ edition = "2021"
 description = "x402 Protocol SDK for Agent-First APIs - Rust core with WASM/Deno bindings"
 authors = ["Your Name"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/yourorg/x402-agent-sdk"
+repository = "https://github.com/Developerfred/x402-agent-sdk"
 
 [package.metadata.wasm-pack.profile.release]
 target = "web"
