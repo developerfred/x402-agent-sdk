@@ -1,0 +1,68 @@
+[package]
+name = "x402-agent-sdk"
+version = "0.1.0"
+edition = "2021"
+description = "x402 Protocol SDK for Agent-First APIs - Rust core with WASM/Deno bindings"
+authors = ["Your Name"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/yourorg/x402-agent-sdk"
+
+[package.metadata.wasm-pack.profile.release]
+target = "web"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["std"]
+std = ["serde/std"]
+wasm = ["wasm-bindgen", "getrandom/wasm-bindgen", "serde-wasm-bindgen", "console_error_panic_hook", "uuid/js"]
+axum = ["dep:axum"]
+
+[dependencies]
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "1.0"
+
+# Utilities
+base64 = "0.22"
+chrono = { version = "0.4", features = ["serde", "clock", "wasmbind"], default-features = false }
+uuid = { version = "1.0", features = ["v4", "serde", "js"], default-features = false }
+hex = "0.4"
+
+# HTTP types
+http = "1.0"
+
+# Async
+tokio = { version = "1.0", features = ["rt", "macros", "sync"] }
+
+# Crypto
+ed25519-dalek = { version = "2.1", features = ["serde"] }
+sha2 = "0.10"
+
+# WASM support
+wasm-bindgen = { version = "0.2", optional = true }
+getrandom = { version = "0.2", features = ["js"] }
+serde-wasm-bindgen = { version = "0.6", optional = true }
+console_error_panic_hook = { version = "0.1", optional = true }
+
+# Framework adapters
+axum = { version = "0.7", optional = true }
+
+# Chain integrations (add solana-sdk when needed separately)
+# solana-sdk = { version = "1.18", optional = true }
+
+# For optional x402-rs integration
+# x402-types = { version = "0.1", optional = true }
+
+[dev-dependencies]
+tokio = { version = "1.0", features = ["full"] }
+reqwest = { version = "0.12", features = ["json"] }
+serde_json = "1.0"
+
+[profile.release]
+opt-level = "s"
+lto = true
