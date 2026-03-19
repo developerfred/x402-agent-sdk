@@ -20,6 +20,7 @@ wasm = ["wasm-bindgen", "getrandom/wasm-bindgen", "serde-wasm-bindgen", "console
 axum = ["dep:axum"]
 solana = []
 stacks = []
+tempo = []
 
 [dependencies]
 # Serialization

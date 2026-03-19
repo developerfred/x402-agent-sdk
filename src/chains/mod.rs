@@ -1,6 +1,7 @@
 pub mod evm;
 pub mod solana;
 pub mod stacks;
+pub mod tempo;
 
 pub use evm::{
     EvmChainId, EvmNetwork, EvmPayment, EvmToken, AMOY_TESTNET, ARBITRUM_MAINNET,
@@ -9,3 +10,4 @@ pub use evm::{
 };
 pub use solana::{SolanaNetwork, SolanaPayment, SolanaToken, SOLANA_NETWORKS};
 pub use stacks::{StacksNetwork, StacksPayment, StacksToken, STACKS_NETWORKS};
+pub use tempo::{TempoNetwork, TempoPayment, TempoSession, TempoStripeConfig, TempoToken};

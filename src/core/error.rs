@@ -20,6 +20,9 @@ pub enum X402Error {
     #[error("Unsupported payment scheme: {0}")]
     UnsupportedScheme(String),
 
+    #[error("Payment failed: {0}")]
+    Payment(String),
+
     #[error("Network error: {0}")]
     NetworkError(String),
 

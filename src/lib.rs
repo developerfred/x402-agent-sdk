@@ -16,7 +16,8 @@ pub use security::{InputValidator, RateLimitConfig, RateLimiter, ValidationError
 
 pub use chains::{
     SolanaNetwork, SolanaPayment, SolanaToken, StacksNetwork, StacksPayment, StacksToken,
-    EvmNetwork, EvmPayment, EvmToken, EVM_NETWORKS,
+    EvmNetwork, EvmPayment, EvmToken, EVM_NETWORKS, TempoNetwork, TempoPayment, TempoToken,
+    TempoSession, TempoStripeConfig,
 };
 
 #[cfg(test)]
