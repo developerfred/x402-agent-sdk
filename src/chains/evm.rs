@@ -162,7 +162,6 @@ impl EvmToken {
                 EvmNetwork::Celo => "0x37fE750F3b8F21D47D79Fc37DA12C4A5A3BfAf80",
                 EvmNetwork::Sepolia => "0x1c7D4B196Cb0C7B01d743F51a9bF63Bd1C5bF85A",
                 EvmNetwork::Amoy => "0x41E94Eb019C0762f9Bfcf9Fb1E5876Bf7339e4B4",
-                _ => return None,
             },
             EvmToken::USDT => match network {
                 EvmNetwork::Ethereum => "0xdAC17F958D2ee523a2206206994597C13D831ec7",
@@ -172,7 +171,9 @@ impl EvmToken {
                 EvmNetwork::Optimism => "0x94b008aA00579c1307B0EF2c49487cb9aEcF7526",
                 EvmNetwork::Avalanche => "0x9702230A8Ea53601f5cD2dc4f74723f3233C80b9",
                 EvmNetwork::Bsc => "0x55d398326f99059fF775485246999027B3197955",
-                _ => return None,
+                EvmNetwork::Celo => "0x4988CC2bC6528CaF6A5dA7fFfE5D0b6e2d3c9A1F",
+                EvmNetwork::Sepolia => "0xA02fF9Ea3D5ED30f5C94EB4D3Cf42e81C8fC0b1d",
+                EvmNetwork::Amoy => "0x1D9fC72DdDd4B83D3F1B6a65e47b1d3c9A3c3F9D1",
             },
             EvmToken::DAI => match network {
                 EvmNetwork::Ethereum => "0x6B175474E89094C44Da98b954EedeAC495271d0F",
