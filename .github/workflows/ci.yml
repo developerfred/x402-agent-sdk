@@ -96,3 +96,62 @@ jobs:
 
       - name: Run Deno type check
         run: deno check deno/mod.ts
+
+  python-adapters:
+    name: Python Adapter Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        working-directory: adapters/python
+        run: pip install -r requirements-test.txt
+
+      - name: Run FastAPI tests
+        run: docker build -f fastapi.Dockerfile -t x402-fastapi-test .
+
+      - name: Run Flask tests
+        run: docker build -f flask.Dockerfile -t x402-flask-test .
+
+      - name: Run Django tests
+        run: docker build -f django.Dockerfile -t x402-django-test .
+
+  go-adapters:
+    name: Go Adapter Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Run Gin tests
+        working-directory: adapters/go/gin
+        run: go mod download && go test -v -cover ./...
+
+      - name: Run Fiber tests
+        working-directory: adapters/go/fiber
+        run: go mod download && go test -v -cover ./...
+
+  java-adapter:
+    name: Java Adapter Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        working-directory: adapters/java/springboot
+        run: mvn test
