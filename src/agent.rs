@@ -3,6 +3,14 @@ use serde::{Deserialize, Serialize};
 use crate::core::error::X402Error;
 use crate::core::payment::{PaymentHeader, PaymentRequired, PaymentToken};
 
+use hex;
+use k256::ecdsa::signature::Signer;
+use k256::ecdsa::{Signature as EcdsaSignature, SigningKey as EcdsaSigningKey};
+use k256::elliptic_curve::sec1::ToEncodedPoint;
+use k256::elliptic_curve::FieldBytes;
+use k256::SecretKey;
+use sha3::{Digest, Keccak256};
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentClientConfig {
     pub wallet_private_key: Option<String>,
@@ -58,12 +66,35 @@ impl AgentClient {
         &self,
         payment_required: &PaymentRequired,
     ) -> Result<PaymentToken, X402Error> {
-        let signature = "placeholder_signature";
+        // Get private key from config
+        let private_key = self.config.wallet_private_key.as_ref().ok_or_else(|| {
+            X402Error::InvalidHeader("No wallet private key configured".to_string())
+        })?;
+
+        // Parse private key (supports hex or 0x prefix)
+        let key_bytes = hex::decode(private_key.trim_start_matches("0x"))
+            .map_err(|e| X402Error::InvalidHeader(format!("Invalid private key: {}", e)))?;
+
+        let secret_key = SecretKey::from_bytes(FieldBytes::<k256::Secp256k1>::from_slice(
+            &key_bytes,
+        ))
+        .map_err(|e| X402Error::InvalidHeader(format!("Invalid private key format: {}", e)))?;
+
+        // Derive sender address from key
+        let sender = compute_address(&secret_key);
+
+        // Create signature payload
+        let payload = create_signature_payload(payment_required);
+
+        // Sign the payload
+        let signing_key = EcdsaSigningKey::from(secret_key);
+        let signature: EcdsaSignature = signing_key.sign(&payload);
+        let signature_hex = format!("0x{}", hex::encode(signature.to_bytes()));
 
         Ok(PaymentToken::new(
             payment_required.clone(),
-            signature,
-            "0xsender",
+            &signature_hex,
+            &sender,
             &payment_required.max_amount,
         ))
     }
@@ -71,6 +102,34 @@ impl AgentClient {
     pub fn encode_token(token: &PaymentToken) -> Result<String, X402Error> {
         token.encode()
     }
+}
+
+fn compute_address(secret_key: &SecretKey) -> String {
+    let public_key = secret_key.public_key();
+    let uncompressed = public_key.to_encoded_point(false);
+    let hash = Keccak256::digest(&uncompressed.as_bytes()[1..]);
+    let address = &hash.as_slice()[12..];
+    format!("0x{}", hex::encode(address))
+}
+
+fn create_signature_payload(payment_required: &PaymentRequired) -> Vec<u8> {
+    let mut hasher = Keccak256::new();
+
+    hasher.update(payment_required.scheme.as_bytes());
+    hasher.update(payment_required.network.as_bytes());
+    hasher.update(payment_required.payment_token.as_bytes());
+    hasher.update(payment_required.max_amount.as_bytes());
+    hasher.update(payment_required.recipient.as_bytes());
+
+    if let Some(desc) = &payment_required.description {
+        hasher.update(desc.as_bytes());
+    }
+
+    if let Some(exp) = &payment_required.expires_at {
+        hasher.update(exp.timestamp().to_string().as_bytes());
+    }
+
+    hasher.finalize().to_vec()
 }
 
 pub struct AgentServer {

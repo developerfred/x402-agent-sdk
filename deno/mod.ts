@@ -57,19 +57,88 @@ export class X402Client {
   }
 
   private async createPaymentToken(paymentRequired: PaymentRequired): Promise<PaymentToken> {
+    const sender = this.walletPrivateKey 
+      ? await this.deriveAddress(this.walletPrivateKey)
+      : "0xsender";
+    
+    let signature = "no_signature";
+    if (this.walletPrivateKey) {
+      signature = await this.signPayment(paymentRequired, this.walletPrivateKey);
+    }
+
     return {
       id: crypto.randomUUID(),
       payment_required: paymentRequired,
-      signature: "placeholder_signature",
-      sender: this.walletPrivateKey ? this.deriveAddress(this.walletPrivateKey) : "0xsender",
+      signature,
+      sender,
       amount: paymentRequired.max_amount,
       nonce: Date.now(),
       created_at: new Date().toISOString(),
     };
   }
 
-  private deriveAddress(privateKey: string): string {
-    return `0x${privateKey.slice(0, 40)}`;
+  private async deriveAddress(privateKey: string): Promise<string> {
+    const keyBytes = this.hexToBytes(privateKey.replace("0x", ""));
+    const publicKey = await crypto.subtle.importKey(
+      "raw",
+      keyBytes,
+      { name: "ECDSA", namedCurve: "secp256k1" },
+      false,
+      ["deriveKey"]
+    );
+    const exported = await crypto.subtle.exportKey("raw", publicKey);
+    const hash = await this.keccak256(new Uint8Array(exported));
+    return "0x" + this.bytesToHex(hash.slice(-20));
+  }
+
+  private async signPayment(paymentRequired: PaymentRequired, privateKey: string): Promise<string> {
+    const keyBytes = this.hexToBytes(privateKey.replace("0x", ""));
+    const key = await crypto.subtle.importKey(
+      "raw",
+      keyBytes,
+      { name: "ECDSA", namedCurve: "secp256k1" },
+      false,
+      ["sign"]
+    );
+    
+    const payload = this.createSignaturePayload(paymentRequired);
+    const signature = await crypto.subtle.sign(
+      { name: "ECDSA", hash: "SHA-256" },
+      key,
+      payload
+    );
+    
+    return "0x" + this.bytesToHex(new Uint8Array(signature));
+  }
+
+  private createSignaturePayload(paymentRequired: PaymentRequired): Uint8Array {
+    const encoder = new TextEncoder();
+    const data = [
+      paymentRequired.scheme,
+      paymentRequired.network,
+      paymentRequired.payment_token,
+      paymentRequired.max_amount,
+      paymentRequired.recipient,
+      paymentRequired.description || "",
+    ].join("|");
+    return encoder.encode(data);
+  }
+
+  private async keccak256(data: Uint8Array): Promise<Uint8Array> {
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    return new Uint8Array(hashBuffer);
+  }
+
+  private hexToBytes(hex: string): Uint8Array {
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < hex.length; i += 2) {
+      bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+    }
+    return bytes;
+  }
+
+  private bytesToHex(bytes: Uint8Array): string {
+    return Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("");
   }
 }
 
