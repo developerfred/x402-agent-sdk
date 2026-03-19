@@ -55,3 +55,9 @@ venv39/
 # Misc
 *.bak
 *.tmp
+
+# Local drafts (tweets)
+tweets/
+
+# CLI builds
+examples/cli/target/

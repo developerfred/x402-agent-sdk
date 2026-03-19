@@ -1,0 +1,12 @@
+[package]
+name = "x402-cli"
+version = "0.1.0"
+edition = "2021"
+description = "x402 CLI - Payment-enabled API toolkit"
+
+[[bin]]
+name = "x402"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
