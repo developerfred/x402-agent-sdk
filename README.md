@@ -1,14 +1,14 @@
 # x402 Agent SDK
 
 <p align="center">
-  <a href="https://github.com/yourorg/x402-agent-sdk/actions/workflows/ci.yml">
-    <img src="https://github.com/yourorg/x402-agent-sdk/actions/workflows/ci.yml/badge.svg" alt="CI">
+  <a href="https://github.com/Developerfred/x402-agent-sdk/actions/workflows/ci.yml">
+    <img src="https://github.com/Developerfred/x402-agent-sdk/actions/workflows/ci.yml/badge.svg" alt="CI">
   </a>
   <a href="https://crates.io/crates/x402-agent-sdk">
     <img src="https://img.shields.io/crates/v/x402-agent-sdk" alt="Crate">
   </a>
-  <a href="https://www.npmjs.com/package/x402-agent-sdk">
-    <img src="https://img.shields.io/npm/v/x402-agent-sdk" alt="NPM">
+  <a href="https://www.npmjs.com/package/@x402/sdk">
+    <img src="https://img.shields.io/npm/v/@x402/sdk" alt="NPM">
   </a>
   <a href="https://discord.gg/x402">
     <img src="https://img.shields.io/discord/123456789" alt="Discord">
@@ -28,12 +28,14 @@ The HTTP 402 "Payment Required" status code has been unused for 30 years. x402 f
 
 ## Features
 
-- 🌐 **Multi-Chain Support**: Ethereum, Polygon, Base, Arbitrum, Optimism, Avalanche, BSC, Celo, Solana, Stacks
+- 🌐 **Multi-Chain Support**: Ethereum, Polygon, Base, Arbitrum, Optimism, Avalanche, BSC, Celo, Solana, Stacks, Tempo
+- ⚡ **Tempo.xyz Integration**: Stripe-backed blockchain with Machine Payments Protocol (MPP)
 - 🔐 **W3C Verifiable Credentials**: Built-in credential generation for agent identity
 - 🛡️ **Security First**: Input validation, rate limiting, address sanitization
 - ⚡ **Fast**: Rust core with WASM bindings for browser/Node.js
-- 🔌 **Framework Adapters**: Express, Fastify, Next.js, Axum
+- 🔌 **Framework Adapters**: Express, Fastify, Next.js, Axum, Django, Flask, Gin, Fiber, Spring Boot
 - 📦 **TypeScript**: Full type definitions included
+- 💳 **MPP Sessions**: OAuth for money - pre-authorize spending caps for AI agents
 
 ## Quick Start
 
@@ -131,6 +133,20 @@ const pr = new WasmPaymentRequired(
 |---------|----------|-------|
 | Mainnet | 0x01 | STX |
 | Testnet | 0x80000000 | STX |
+
+### Tempo (Stripe + Paradigm)
+
+| Network | Chain ID | Features |
+|---------|----------|----------|
+| Mainnet | 5000 | Stripe integration, MPP Sessions |
+| Testnet | 5001 | Testing |
+| Devnet | 5002 | Local development |
+
+**Tempo** is Stripe and Paradigm's blockchain for payments:
+- Native Stripe integration (accept fiat + crypto)
+- Machine Payments Protocol (MPP) for AI agents
+- Sessions: Pre-authorize spending caps for streaming payments
+- 100K TPS, sub-second finality
 
 ## Framework Integration
 
