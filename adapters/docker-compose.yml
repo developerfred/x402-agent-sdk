@@ -1,0 +1,183 @@
+version: '3.8'
+
+# X402 Agent SDK - Complete Test Suite
+# Run with: docker-compose --profile test up
+# Run specific: docker-compose up python-fastapi-test
+
+services:
+  # ===========================================
+  # PYTHON TESTS
+  # ===========================================
+  
+  python-fastapi-test:
+    build:
+      context: ..
+      dockerfile: adapters/python/fastapi.Dockerfile
+    container_name: x402-test-python-fastapi
+    profiles: ["python", "test", "all"]
+    working_dir: /app
+
+  python-flask-test:
+    build:
+      context: ..
+      dockerfile: adapters/python/flask.Dockerfile
+    container_name: x402-test-python-flask
+    profiles: ["python", "test", "all"]
+    working_dir: /app
+
+  python-django-test:
+    build:
+      context: ..
+      dockerfile: adapters/python/django.Dockerfile
+    container_name: x402-test-python-django
+    profiles: ["python", "test", "all"]
+    working_dir: /app
+
+  # ===========================================
+  # GO TESTS
+  # ===========================================
+
+  go-gin-test:
+    build:
+      context: ..
+      dockerfile: adapters/go/gin.Dockerfile
+    container_name: x402-test-go-gin
+    profiles: ["go", "test", "all"]
+    working_dir: /app
+
+  go-fiber-test:
+    build:
+      context: ../..
+      dockerfile: adapters/go/fiber/Dockerfile
+    container_name: x402-test-go-fiber
+    profiles: ["go", "all"]
+    volumes:
+      - ./adapters/go/fiber:/app
+    networks:
+      - x402-test-network
+
+  # ===========================================
+  # JAVA TESTS
+  # ===========================================
+
+  java-springboot-test:
+    build:
+      context: ../..
+      dockerfile: adapters/java/springboot/Dockerfile
+    container_name: x402-test-springboot
+    profiles: ["java", "all"]
+    volumes:
+      - ./adapters/java/springboot:/app
+    networks:
+      - x402-test-network
+
+  java-quarkus-test:
+    build:
+      context: ../..
+      dockerfile: adapters/java/quarkus/Dockerfile
+    container_name: x402-test-quarkus
+    profiles: ["java", "all"]
+    volumes:
+      - ./adapters/java/quarkus:/app
+    networks:
+      - x402-test-network
+
+  # ===========================================
+  # RUST TESTS
+  # ===========================================
+
+  rust-actix-test:
+    build:
+      context: ../..
+      dockerfile: adapters/rust/actix/Dockerfile
+    container_name: x402-test-actix
+    profiles: ["rust", "all"]
+    volumes:
+      - ./adapters/rust/actix:/app
+    networks:
+      - x402-test-network
+
+  rust-rocket-test:
+    build:
+      context: ../..
+      dockerfile: adapters/rust/rocket/Dockerfile
+    container_name: x402-test-rocket
+    profiles: ["rust", "all"]
+    volumes:
+      - ./adapters/rust/rocket:/app
+    networks:
+      - x402-test-network
+
+  # ===========================================
+  # C# /.NET TESTS
+  # ===========================================
+
+  dotnet-test:
+    build:
+      context: ../..
+      dockerfile: adapters/dotnet/Dockerfile
+    container_name: x402-test-dotnet
+    profiles: ["dotnet", "all"]
+    volumes:
+      - ./adapters/dotnet:/app
+    networks:
+      - x402-test-network
+
+  # ===========================================
+  # RUBY TESTS
+  # ===========================================
+
+  ruby-rails-test:
+    build:
+      context: ../..
+      dockerfile: adapters/ruby/rails/Dockerfile
+    container_name: x402-test-rails
+    profiles: ["ruby", "all"]
+    volumes:
+      - ./adapters/ruby/rails:/app
+    networks:
+      - x402-test-network
+
+  # ===========================================
+  # PHP TESTS
+  # ===========================================
+
+  php-laravel-test:
+    build:
+      context: ../..
+      dockerfile: adapters/php/laravel/Dockerfile
+    container_name: x402-test-laravel
+    profiles: ["php", "all"]
+    volumes:
+      - ./adapters/php/laravel:/app
+    networks:
+      - x402-test-network
+
+  php-symfony-test:
+    build:
+      context: ../..
+      dockerfile: adapters/php/symfony/Dockerfile
+    container_name: x402-test-symfony
+    profiles: ["php", "all"]
+    volumes:
+      - ./adapters/php/symfony:/app
+    networks:
+      - x402-test-network
+
+  # ===========================================
+  # CORE RUST TEST (Already exists)
+  # ===========================================
+
+  rust-core-test:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: x402-test-core
+    profiles: ["core", "all"]
+    command: cargo test --lib
+    networks:
+      - x402-test-network
+
+networks:
+  x402-test-network:
+    driver: bridge
