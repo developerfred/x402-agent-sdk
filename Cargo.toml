@@ -18,6 +18,8 @@ default = ["std"]
 std = ["serde/std"]
 wasm = ["wasm-bindgen", "getrandom/wasm-bindgen", "serde-wasm-bindgen", "console_error_panic_hook", "uuid/js"]
 axum = ["dep:axum"]
+solana = []
+stacks = []
 
 [dependencies]
 # Serialization
