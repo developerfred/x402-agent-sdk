@@ -30,10 +30,13 @@ The HTTP 402 "Payment Required" status code has been unused for 30 years. x402 f
 
 - 🌐 **Multi-Chain Support**: Ethereum, Polygon, Base, Arbitrum, Optimism, Avalanche, BSC, Celo, Solana, Stacks, Tempo
 - ⚡ **Tempo.xyz Integration**: Stripe-backed blockchain with Machine Payments Protocol (MPP)
+- ⚡ **Lightning Network**: Bitcoin Lightning Network support for micropayments (LND, Core Lightning, LNURL)
 - 🔐 **W3C Verifiable Credentials**: Built-in credential generation for agent identity
-- 🛡️ **Security First**: Input validation, rate limiting, address sanitization
+- 🛡️ **Security First**: Input validation, rate limiting, address sanitization, ECDSA signing
 - ⚡ **Fast**: Rust core with WASM bindings for browser/Node.js
 - 🔌 **Framework Adapters**: Express, Fastify, Next.js, Axum, Django, Flask, Gin, Fiber, Spring Boot
+- 🛒 **Platform Adapters**: Shopify, WordPress plugins
+- 💳 **Payment Facilitators**: Stripe, Coinbase Commerce, Tempo.xyz
 - 📦 **TypeScript**: Full type definitions included
 - 💳 **MPP Sessions**: OAuth for money - pre-authorize spending caps for AI agents
 
@@ -342,6 +345,86 @@ Rails.application.config.x402.recipient = "0x742d35Cc6634C0532925a3b844Bc9e7595f
 protected $middleware = [
     \App\Http\Middleware\X402Middleware::class,
 ];
+```
+
+## Platform Adapters
+
+### Shopify
+
+```typescript
+import { x402Shopify } from "x402-agent-sdk/adapters/shopify";
+
+const shopify = x402Shopify({
+  shopDomain: "your-store.myshopify.com",
+  accessToken: "your-access-token",
+  pricePerRequest: 100,
+  network: "eip155:1",
+  paymentToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+});
+```
+
+### WordPress
+
+```php
+// In your WordPress plugin
+add_action('init', function() {
+    x402_init([
+        'price_per_request' => 100,
+        'network' => 'eip155:1',
+        'payment_token' => '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        'recipient' => '0x742d35Cc6634C0532925a3b844Bc9e7595f0fB1E'
+    ]);
+});
+```
+
+## Payment Facilitators
+
+### Stripe
+
+```typescript
+import { StripeFacilitator } from "x402-agent-sdk/adapters/facilitator";
+
+const stripe = new StripeFacilitator("sk_live_...");
+const result = await stripe.verifyPayment({
+  txHash: "pi_xxx",
+  amount: "100",
+  token: "usd",
+  network: "stripe",
+  recipient: "acct_xxx",
+  from: "cus_xxx"
+});
+```
+
+### Tempo.xyz
+
+```typescript
+import { TempoFacilitator } from "x402-agent-sdk/adapters/facilitator";
+
+const tempo = new TempoFacilitator("tempo_api_key");
+const session = await tempo.createPaymentLink({
+  amount: "100",
+  token: "USDC",
+  recipient: "0x742d...",
+  description: "API Access"
+});
+```
+
+### Bitcoin Lightning
+
+```typescript
+import { createLightningAdapter } from "x402-agent-sdk/adapters/lightning";
+
+const lightning = createLightningAdapter({
+  nodeType: 'lnd',
+  nodeUrl: 'https://localhost:8080',
+  authToken: 'macaroon_hex'
+});
+
+const invoice = await lightning.createInvoice({
+  amount: 1000,  // sats
+  description: 'API Access',
+  expirySeconds: 3600
+});
 ```
 
 ## Payment Flow
